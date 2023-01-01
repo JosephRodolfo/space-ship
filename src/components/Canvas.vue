@@ -15,6 +15,7 @@ export interface Circles {
     radius: number,
     scaleMultiplier: number,
     velocity: number,
+    angle: number
 }
 
 const props = defineProps({
@@ -34,10 +35,10 @@ watch([props], () => {
     const myContext = canvasRef.value?.getContext('2d');
     let velocity = props.circles![0].velocity
 
-    if (velocity > 500) {
+    if (velocity > 499) {
         velocity = 500;
     };
-    if (velocity < -500) {
+    if (velocity < -499) {
         velocity = -500
     };
 
@@ -48,10 +49,10 @@ watch([props], () => {
 
 function drawSequence(context: CanvasRenderingContext2D) {
     if (currentBackGroundPosition.value < -500) {
-        currentBackGroundPosition.value += 500;
+        currentBackGroundPosition.value += 1000;
     }
     if (currentBackGroundPosition.value > 500) {
-        currentBackGroundPosition.value += -500;
+        currentBackGroundPosition.value += -1000;
     }
 
     context.drawImage(background.value, -500 + currentBackGroundPosition.value, -500, 1500, 1500);
