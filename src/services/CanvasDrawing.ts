@@ -17,7 +17,7 @@ class CanvasDrawing {
         context.fillStyle = 'green';
         context.beginPath();
         context.moveTo(x, y);
-        context.lineTo(x +10, y);
+        context.lineTo(x -10, y);
         context.stroke();
     }
     // clearBackground(context: CanvasRenderingContext2D): void {

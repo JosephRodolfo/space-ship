@@ -8,7 +8,8 @@
 <script setup lang="ts">
 
 import { canvasDrawer } from '../services/CanvasDrawing';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
+import { timer } from '../services/timer';
 export interface Circles {
     x: number,
     y: number,
@@ -16,6 +17,12 @@ export interface Circles {
     scaleMultiplier: number,
     velocity: number,
     angle: number
+    velocityX: number,
+    velocityY: number
+    angularVelocity: number,
+    angularAcceleration: number,
+    acceleration: number,
+
 }
 
 const props = defineProps({
@@ -23,7 +30,7 @@ const props = defineProps({
 });
 const canvasRef = ref<HTMLCanvasElement>();
 const background: string | any = ref('');
-const currentBackGroundPosition = ref(0);
+const currentBackGroundPosition = reactive({x:0, y:0});
 const ship: string | any = ref('');
 
 onMounted(() => {
@@ -34,32 +41,46 @@ onMounted(() => {
     drawSequence(myContext!)
 })
 
-watch([props], () => {
+watch([props.circles], () => {
     const myContext = canvasRef.value?.getContext('2d');
-    let velocity = props.circles![0].velocity
+    let xVelocity = props.circles![0].velocityX;
+    let yVelocity = props.circles![0].velocityY;
 
-    if (velocity > 499) {
-        velocity = 500;
+    if (xVelocity > 499) {
+        xVelocity = 500;
     };
-    if (velocity < -499) {
-        velocity = -500
+    if (xVelocity < -499) {
+        xVelocity = -500
+    };
+    if (yVelocity > 499) {
+        yVelocity = 500;
+    };
+    if (yVelocity < -499) {
+        yVelocity = -500
     };
 
-    currentBackGroundPosition.value += velocity;
+    currentBackGroundPosition.x += xVelocity;
+    currentBackGroundPosition.y += yVelocity;
 
     drawSequence(myContext!);
 })
 
 function drawSequence(context: CanvasRenderingContext2D) {
-    if (currentBackGroundPosition.value < -500) {
-        currentBackGroundPosition.value += 1000;
+    if (currentBackGroundPosition.x < -500) {
+        currentBackGroundPosition.x += 1000;
     }
-    if (currentBackGroundPosition.value > 500) {
-        currentBackGroundPosition.value += -1000;
+    if (currentBackGroundPosition.x > 500) {
+        currentBackGroundPosition.x += -1000;
+    }
+    if (currentBackGroundPosition.y < -500) {
+        currentBackGroundPosition.y += 1000;
+    }
+    if (currentBackGroundPosition.y > 500) {
+        currentBackGroundPosition.y += -1000;
     }
     requestAnimationFrame(() => {
 
-        context.drawImage(background.value, -500 + currentBackGroundPosition.value, -500, 1500, 1500);
+        context.drawImage(background.value, -500 + currentBackGroundPosition.x, -500 + currentBackGroundPosition.y, 1500, 1500);
         context.save()
         context.translate(250, 250);
         context.rotate(props.circles![0].angle * Math.PI / 180);
