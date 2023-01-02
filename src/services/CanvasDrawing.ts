@@ -1,3 +1,5 @@
+import { Circles } from "../components/Canvas.vue";
+
 interface Star {
     x: number,
     y: number
@@ -9,10 +11,14 @@ class CanvasDrawing {
     }
     drawCircle(x: number, y: number, radius: number, context: CanvasRenderingContext2D): void {
         context.fillStyle = 'white';
-
         context.beginPath();
         context.arc(x, y, radius, 0, 2 * Math.PI);
         context.fill();
+        context.fillStyle = 'green';
+        context.beginPath();
+        context.moveTo(x, y);
+        context.lineTo(x +10, y);
+        context.stroke();
     }
     // clearBackground(context: CanvasRenderingContext2D): void {
     //     const { width, height } = context.canvas;
@@ -45,6 +51,35 @@ class CanvasDrawing {
         img.src = newImage;
         return img;
     };
+
+    clipShip(
+        canvasToClip: CanvasRenderingContext2D,
+    ) {
+        const newCanvas: HTMLCanvasElement | null = document.createElement("canvas");
+        const h = 20;
+        const w = 20;
+        newCanvas.width = w;
+        newCanvas.height = h;
+        const newContext = newCanvas.getContext("2d");
+        if (!newContext) {
+            return;
+        }
+        
+    
+        this.drawCircle(10, 10, 10, newContext)
+        
+        // newContext.fillStyle = 'white';
+
+        // newContext.beginPath();
+        // newContext.arc(0, 0, 10, 0, 2 * Math.PI);
+        // newContext.fill();
+        newContext.drawImage(canvasToClip.canvas, 0, 0, w, h, 0, 0, 0, 0);
+        const newImage = newContext.canvas.toDataURL("image/jpeg", 1.0);
+        const img = new Image();
+        img.src = newImage;
+        return img;
+    };
+
     createStars() {
         let array = [];
         function randomNumber() {
