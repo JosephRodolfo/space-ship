@@ -35,9 +35,10 @@ let debounce = ref(false);
 let debounceAngle = ref(false);
 
 function flipXdirection() {
-  if (circleProps.value[0].angle === 0) circleProps.value[0].angle = 180;
-  else circleProps.value[0].angle = 0;
+  // if (circleProps.value[0].angle === 0) circleProps.value[0].angle = 45;
+  // else circleProps.value[0].angle = 0;
 
+  circleProps.value[0].angle +=15
 }
 function accelerate(e: any) {
   if (e.key === 'w') {
@@ -62,7 +63,7 @@ function accelerate(e: any) {
     if (!debounceAngle.value) {
       debounceAngle.value = true;
       setTimeout(() => {
-        if (spinning.value) handleSpin(.000001);
+        if (spinning.value) handleSpin(.001);
         debounceAngle.value = false;
       }, 200)
     }
@@ -72,7 +73,7 @@ function accelerate(e: any) {
     if (!debounceAngle.value) {
       debounceAngle.value = true;
       setTimeout(() => {
-        if (spinning.value) handleSpin(-.000001);
+        if (spinning.value) handleSpin(-.001);
         debounceAngle.value = false;
       }, 200)
     }
@@ -135,6 +136,33 @@ const isVelocityPositive = computed(() => {
 
 }
 )
+
+const isXVelocityPositive = computed(() => {
+
+
+
+if (circleProps.value[0].angle < 270 && circleProps.value[0].angle > 90) {
+  return true
+} else {
+  return false
+}
+
+}
+)
+
+const isYVelocityPositive = computed(() => {
+
+
+
+if (circleProps.value[0].angle < 0 && circleProps.value[0].angle > 180) {
+  return true
+} else {
+  return false
+}
+
+}
+)
+
 
 
 let time = ref(0);
@@ -209,8 +237,6 @@ function startMovingVector(time: number, velocity: number, positionX: number, po
   const newVelocityX = calculateVelocityX(velocity, acceleration, time, radians);
   const newVelocityY = calculateVelocityY(velocity, acceleration, time, radians)
   return { position, newVelocity, newVelocityX, newVelocityY };
-
-
 }
 
 
@@ -232,11 +258,10 @@ function calculateVelocityX(velocity: number, acceleration: number, time: number
 
   const result = (velocity * Math.cos(angle)) + (acceleration * time);
 
-  if (velocity > 0) {
+  if (!isXVelocityPositive.value) {
     return Math.abs(result);
   } else {
     return -Math.abs(result)
-
   }
 
 
@@ -249,7 +274,7 @@ function calculateVelocityY(velocity: number, acceleration: number, time: number
   const result = (velocity * Math.sin(angle)) + (acceleration * time);
 
 
-  if (velocity > 0) {
+  if (!isYVelocityPositive.value) {
     return Math.abs(result);
   } else {
     return -Math.abs(result)
@@ -272,14 +297,10 @@ function calculateAngle(originalAngle: number, angularVelocity: number, time: nu
 }
 
 function calculateVelocity(originalVelocity: number, acceleration: number, time: number) {
-  console.log(isVelocityPositive.value)
-  if (!isVelocityPositive.value) {
+
     return originalVelocity + (acceleration * time);
 
-  } else {
-    return originalVelocity - (acceleration * time);
-
-  }
+  
 }
 
 
