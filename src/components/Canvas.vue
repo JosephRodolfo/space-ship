@@ -14,7 +14,6 @@ export interface Circles {
     x: number,
     y: number,
     radius: number,
-    scaleMultiplier: number,
     velocity: number,
     angle: number
     velocityX: number,
@@ -22,6 +21,7 @@ export interface Circles {
     angularVelocity: number,
     angularAcceleration: number,
     acceleration: number,
+    thrusterAngle: number,
 
 }
 
@@ -41,7 +41,7 @@ onMounted(() => {
     drawSequence(myContext!)
 })
 
-watch([props.circles], () => {
+watch([props], () => {
     const myContext = canvasRef.value?.getContext('2d');
     let xVelocity = props.circles![0].velocityX;
     let yVelocity = props.circles![0].velocityY;
@@ -83,7 +83,7 @@ function drawSequence(context: CanvasRenderingContext2D) {
         context.drawImage(background.value, -500 + currentBackGroundPosition.x, -500 + currentBackGroundPosition.y, 1500, 1500);
         context.save()
         context.translate(250, 250);
-        context.rotate(props.circles![0].angle * Math.PI / 180);
+        context.rotate(props.circles![0].thrusterAngle * Math.PI / 180);
         context.translate(-250,-250);
         context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
         context.restore();

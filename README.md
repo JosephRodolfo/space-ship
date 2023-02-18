@@ -16,3 +16,47 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
    1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
    2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
 2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+
+const mass = 10; // mass of the object in kilograms
+const initialVelocity = 5; // initial velocity in meters/second
+const initialPosition = 0; // initial position in meters
+const timeStep = 0.1; // time step in seconds
+let angle = 45; // initial angle in degrees
+let thrusterAngle = 0; // angle of the thruster in degrees
+let acceleration = 0; // acceleration in meters/second^2
+
+let velocity = initialVelocity; // current velocity of the object
+let xVelocity = Math.cos(angle * (Math.PI / 180)) * velocity; // x velocity in meters/second
+let yVelocity = Math.sin(angle * (Math.PI / 180)) * velocity; // y velocity in meters/second
+let position = initialPosition; // current position in meters
+let xPosition = initialPosition; // current x position in meters
+let yPosition = initialPosition; // current y position in meters
+
+function updatePosition() {
+  // calculate the force acting on the object based on the angle of the thruster
+  const force = mass * acceleration * Math.cos((thrusterAngle - angle) * (Math.PI / 180));
+
+  // update the velocity based on the force and the time step
+  velocity += force * timeStep / mass;
+  if (velocity < 0) {
+    velocity = -velocity;
+    angle += 180;
+  }
+
+  // update the angle of the object's motion based on the velocity
+  angle += Math.atan2(yVelocity, xVelocity) * 180 / Math.PI;
+
+  // recalculate the x and y velocities based on the new angle
+  xVelocity = Math.cos(angle * (Math.PI / 180)) * velocity;
+  yVelocity = Math.sin(angle * (Math.PI / 180)) * velocity;
+
+  // update the position based on the velocity and the time step
+  position += velocity * timeStep;
+  xPosition += xVelocity * timeStep;
+  yPosition += yVelocity * timeStep;
+
+  console.log(`Position: (${xPosition}, ${yPosition}) meters`);
+}
+
+// update the position of the object every time step
+setInterval(updatePosition, timeStep * 1000);
