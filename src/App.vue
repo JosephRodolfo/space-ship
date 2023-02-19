@@ -17,9 +17,9 @@
       <p>Velocity Angle: {{ formatNumber(ship.angle) }}</p>
       <p>Thruster Angle: {{ formatNumber(ship.thrusterAngle) }}</p>
 
-      <!-- <p>Angular Acceleration: {{ formatNumber(ship.angularAcceleration) }}</p> -->
+      <p>Angular Acceleration: {{ formatNumber(ship.angularAcceleration) }}</p>
 
-      <!-- <p>Angular Velocity: {{ formatNumber(ship.angularVelocity) }}</p> -->
+      <p>Angular Velocity: {{ formatNumber(ship.angularVelocity) }}</p>
       <button @click="flipShip">Turn</button>
 
     </div>
@@ -39,6 +39,9 @@ const ship = reactive(new Ship());
 let counter = 0;
 const acceleration = ref(ship.acceleration);
 let lock: any = ref(false);
+let angularAccelerationValue = ref(0);
+
+let thrusterLock = ref(false);
 function flipShip() {
   ship.setThrusterAngle(ship.thrusterAngle + 45);
 }
@@ -46,14 +49,13 @@ function flipShip() {
 
 function move() {
   timer.start(() => {
+    if (thrusterLock.value) ship.fireThruster(angularAccelerationValue.value);
+    ship.calculateAngularVelocity(1);
+    ship.setAngleFromAngularVelocity(1);
+    if (lock.value) ship.accelerate();
+    ship.calculateVelocity(1)
+    ship.setPosition(1);
 
-      console.log('move tiemr')
-
-      ship.accelerate();
-      ship.setVelocity(1);
-      ship.calculateVelocity(1)
-      ship.setPosition(1);
-  
   }, 100)
 }
 
@@ -66,29 +68,48 @@ function handleAccelerate(e: any) {
     lock.value = true;
     move();
   }
-  // if (e.key === 'a' && !ship.spinning){
-  //   ship.spinning = true;
-  //   lock.value = true;
-  //   move();
-  // }
+  if (e.key === 'a' && !thrusterLock.value) {
+    thrusterLock.value = true;
+    angularAccelerationValue.value = .01
+    move();
+
+  }
+  if (e.key === 'd' && !thrusterLock.value) {
+    thrusterLock.value = true;
+
+    angularAccelerationValue.value = -.01
+    move();
+
+
+  }
+
 
 }
 function stopAccelerate(e: any) {
   if (e.key === 'w' && lock.value) {
     ship.stopAccelerating();
-    // ship.accelerating = false;
-
     timer.stop();
     lock.value = false;
   }
 
-  // if (e.key === 'a' && lock.value) {
-  //   ship.angularAcceleration = 0;
-  //   ship.spinning = false;
+  if (e.key === 'a') {
+    angularAccelerationValue.value = 0
+    thrusterLock.value = false;
+    timer.stop();
 
-  //   timer.stop();
-  //   lock.value = false;
-  // }
+    ship.stopFiringThruster();
+  }
+
+
+  if (e.key === 'd') {
+    angularAccelerationValue.value = 0
+    thrusterLock.value = false;
+    timer.stop();
+
+    ship.stopFiringThruster();
+
+
+  }
 }
 
 
@@ -98,12 +119,14 @@ onMounted(() => {
 
   setInterval(() => {
 
-    if (!lock.value && ship.acceleration === 0) {
+    if (!lock.value && !thrusterLock.value && ship.acceleration === 0) {
       console.log('main tiemr')
+      ship.calculateAngularVelocity(1);
+      ship.setAngleFromAngularVelocity(1);
 
       ship.stopAccelerating();
-      ship.setVelocity(1);
       ship.calculateVelocity(1);
+
       ship.setPosition(1);
 
     }

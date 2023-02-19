@@ -1,6 +1,6 @@
+import { Rotation } from './rotation';
 
-
-export class Ship {
+export class Ship extends Rotation {
     x: number;
     y: number;
     velocityX: number;
@@ -14,6 +14,7 @@ export class Ship {
     angularAcceleration: number;
 
     constructor() {
+        super();
         this.x = 250;
         this.y = 250;
         this.velocityX = 0;
@@ -28,34 +29,28 @@ export class Ship {
     }
 
 
-    setVelocity(time: number) {
-
-   
-    }
     calculateVelocity(time: number) {
         if (this.acceleration === 0) return;
         const angleInRadians = (this.angle * Math.PI) / 180;
-        let velocityX = this.velocityX + (this.force * time / this.mass) * Math.cos(angleInRadians);
-        let velocityY = this.velocityY + (this.force * time / this.mass) * Math.sin(angleInRadians);
     
-        const accelerationMagnitude = this.acceleration * time;
-        const accelerationAngle = angleInRadians; // use ship's orientation angle directly as acceleration angle
-        const accelerationX = accelerationMagnitude * Math.cos(accelerationAngle);
-        const accelerationY = accelerationMagnitude * Math.sin(accelerationAngle);
+        // Calculate the velocity change due to the acceleration.
+        const deltaVx = (this.acceleration * time) * Math.cos(angleInRadians);
+        const deltaVy = (this.acceleration * time) * Math.sin(angleInRadians);
     
-        // calculate x velocity
-        if (accelerationX !== 0) {
-            velocityX += accelerationX;
+        // Update the velocity.
+        this.velocityX += deltaVx;
+        this.velocityY += deltaVy;
+    
+        // Calculate the total velocity magnitude and direction.
+        const totalVelocityMagnitude = Math.sqrt(this.velocityX ** 2 + this.velocityY ** 2);
+        // const totalVelocityAngle = Math.atan2(this.velocityY, this.velocityX);
+    
+        // If the total velocity magnitude exceeds the speed of light, scale it back.
+        if (totalVelocityMagnitude > 299792458) {
+            const scaleFactor = 299792458 / totalVelocityMagnitude;
+            this.velocityX *= scaleFactor;
+            this.velocityY *= scaleFactor;
         }
-        
-        // calculate y velocity
-        if (accelerationY !== 0) {
-            velocityY += accelerationY;
-        }
-        
-        // update velocity
-        this.velocityX = velocityX;
-        this.velocityY = velocityY;
     }
     
 
