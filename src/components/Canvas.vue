@@ -13,8 +13,8 @@ import { timer } from '../services/timer';
 export interface Circles {
     x: number,
     y: number,
-    radius: number,
-    velocity: number,
+    // radius: number,
+    // velocity: number,
     angle: number
     velocityX: number,
     velocityY: number

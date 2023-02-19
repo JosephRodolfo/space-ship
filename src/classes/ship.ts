@@ -1,146 +1,94 @@
-import { degreesToRadians, radiansToDegrees } from "../helpers/helpers";
 
-export interface Velocities {
-    velocityX: number,
-    velocityY: number
-}
 
-export class Ship implements Velocities {
-    radius: number = 10;
-    mass: number = 100;
-    position: number = 0;
-    x: number = 250;
-    y: number = 250;
-    acceleration: number = 0;
-    velocity: number = 0;
-    thrusterAngle: number = 180;
-    angle: number = 0;
-    angularVelocity: number = 0;
-    angularAcceleration: number = 0;
-    spinning: boolean = false;
-    accelerating: boolean = false;
-    velocityX: number = 0;
-    velocityY: number = 0;
-
+export class Ship {
+    x: number;
+    y: number;
+    velocityX: number;
+    velocityY: number;
+    acceleration: number;
+    mass: number;
+    angle: number;
+    thrusterAngle: number;
+    force: number;
+    angularVelocity: number;
+    angularAcceleration: number;
 
     constructor() {
+        this.x = 250;
+        this.y = 250;
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.acceleration = 0.0;
+        this.mass = 1000;
+        this.angle = 180;
+        this.thrusterAngle = 180;
+        this.force = 0.01;
+        this.angularAcceleration = 0;
+        this.angularVelocity = 0;
     }
 
-    setAcceleration(acceleration: number) {
-        if (!this.accelerating) {
-            this.acceleration = 0;
-        }
-        this.acceleration += acceleration;
-    }
-
-    setAngularAcceleration(acceleration: number) {
-        if (!this.spinning) {
-            this.angularAcceleration = 0;
-        }
-        this.angularAcceleration += acceleration;
-    }
-
-
-    setAngularVelocity(time: number) {
-        this.angularVelocity += this.angularAcceleration * time;
-    }
-
-    setAngle(time: number) {
-        if (this.thrusterAngle > 360) this.thrusterAngle = 0;
-        if (this.thrusterAngle < 0) this.thrusterAngle = 360;
-        this.thrusterAngle  = this.thrusterAngle += this.angularVelocity * time + (0.5 * this.angularAcceleration * time * time);
-    }
 
     setVelocity(time: number) {
-   
-        this.velocity += (this.force * time / this.mass);
-    
-    }
 
    
-
-
-
-    get force() {
-        const force = this.mass * this.acceleration;
-        return force
     }
-
     calculateVelocity(time: number) {
+        if (this.acceleration === 0) return;
         const angleInRadians = (this.angle * Math.PI) / 180;
-      
-        let xAcceleration = this.acceleration * Math.cos(angleInRadians);
-        const yAcceleration = this.acceleration * Math.sin(angleInRadians);
-        let multiplier = 1
-        if (xAcceleration < 0 && this.velocity > 0) {
-            multiplier = -1
-            
-        }
-        this.velocityX = (multiplier * this.velocity) * Math.cos(angleInRadians) * multiplier + xAcceleration * time;
-
-        // this.velocityY = this.velocity * Math.sin(angleInRadians) + yAcceleration * time;
-      
-        // return { x: xVelocity, y: yVelocity };
-      }
-      
-
-    // setVelocityX() {
-
-    //     if (!this.accelerating) {
-    //         return;
-    //     }
-    //     // if (this.angle === 90 || this.angle === 270) {
-    //     //     this.velocityX = 0;
-    //     //     return;
-    //     // }
-    //     this.velocityX = Math.cos((this.angle * Math.PI) / 180) * this.velocity;
-    // }
-    // setVelocityY() {
-
-    //     if (!this.accelerating) {
-    //         return;
-    //     }
-    //     // if (this.angle === 0 || this.angle === 180) {
-    //     //     this.velocityY = 0;
-    //     //     return;
-    //     // }
-    //     this.velocityY = Math.sin((this.angle * Math.PI) / 180) * this.velocity;
-    // }
-
-    setPostion(time: number) {
-        this.position += this.velocity * time
-        this.x += this.velocityX * time;
-        this.y += this.velocityY * time
-
-    }
-
-
-    setVelocities(time: number) {
-        this.calculateVelocity(time);
-
-        this.setVelocity(time);
-    }
-
-
+        let velocityX = this.velocityX + (this.force * time / this.mass) * Math.cos(angleInRadians);
+        let velocityY = this.velocityY + (this.force * time / this.mass) * Math.sin(angleInRadians);
     
-    accelerate(time: number, acceleration: number) {
-        this.accelerating = true;
+        const accelerationMagnitude = this.acceleration * time;
+        const accelerationAngle = angleInRadians; // use ship's orientation angle directly as acceleration angle
+        const accelerationX = accelerationMagnitude * Math.cos(accelerationAngle);
+        const accelerationY = accelerationMagnitude * Math.sin(accelerationAngle);
+    
+        // calculate x velocity
+        if (accelerationX !== 0) {
+            velocityX += accelerationX;
+        }
+        
+        // calculate y velocity
+        if (accelerationY !== 0) {
+            velocityY += accelerationY;
+        }
+        
+        // update velocity
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+    }
+    
+
+    setPosition(time: number) {
+        this.x += this.velocityX * time;
+        this.y += this.velocityY * time;
+    }
+
+
+    setAngle() {
         this.angle = this.thrusterAngle;
-        this.setAcceleration(acceleration)
-        this.setVelocities(time);
-        this.setPostion(time);
     }
 
-    angularAccelerate(time: number, acceleration: number) {
-        this.setAngularAcceleration(acceleration);
-        this.setAngularVelocity(time);
-        this.setAngle(time);
-
+    setThrusterAngle(angle: number) {
+        let newAngle = angle
+        if (newAngle > 360) {
+            newAngle = 0;
+        }
+        if (newAngle < 0) {
+            newAngle = 360;
+        }
+        this.thrusterAngle = newAngle;
     }
 
-
-
+    stopAccelerating() {
+        this.acceleration = 0;
+        this.calculateVelocity(0);
+    }
+    accelerate() {
+        this.setAngle();
+        this.acceleration += 0.01;
+    }
 
 }
 
-export const ship = new Ship;
+
