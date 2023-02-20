@@ -23,7 +23,12 @@
       <button @click="flipShip">Turn</button>
 
     </div>
-    <Gauge :width="100" :height="100" :value="1919" :max="100" :gapSize="60"></Gauge>
+    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="5" :gapSize="60" ></Gauge>
+    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="50" :gapSize="90" ></Gauge>
+    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="100" :gapSize="120" ></Gauge>
+
+    <Gauge :label="'acceleration'" :width="100" :height="100" :value="ship.acceleration" :max="10" :gapSize="180" ></Gauge>
+
     <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="[ship]">
     </MainCanvas>
 

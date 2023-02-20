@@ -133,15 +133,15 @@ class CanvasDrawing {
         newContext.stroke();
 
 
-        function radiansToFraction(radians: number) {
-            return radians / (2 * Math.PI);
+        function radiansToFraction(radians: number, gapSize: number = 0) {
+            return radians / ((2 * Math.PI) - gapSizeRadians);
         }
 
-        const numDashes = 24; // 360 degrees divided by 5
+        const numDashes = 12; // 360 degrees divided by 5
         const dashLength = 16;
         const angleIncrement = (2 * Math.PI - gapSizeRadians) / numDashes; // subtract gap size from total angle range
 
-        for (let i = 0; i < numDashes; i++) {
+        for (let i = 0; i <= numDashes; i++) {
             const angle = i * angleIncrement;
             const x1 = width / 2 + (width / 2 - dashLength) * Math.cos(angle);
             const y1 = height / 2 + (width / 2 - dashLength) * Math.sin(angle);
@@ -153,11 +153,11 @@ class CanvasDrawing {
             newContext.lineTo(x2, y2);
             newContext.lineWidth = 2;
             newContext.stroke();
-            if (i % 3 === 0 || i === numDashes - 1) {
-                const labelAngle = angle;
-                const labelX = width / 2 + (width / 2 - 25) * Math.cos(labelAngle);
-                const labelY = height / 2 + (width / 2 - 25) * Math.sin(labelAngle);
-                const percentage = radiansToFraction(angle)
+
+            if (i === numDashes || i === 0) {
+                const labelX = width / 2 + (width / 2 - 25) * Math.cos(angle);
+                const labelY = height / 2 + (width / 2 - 25) * Math.sin(angle);
+                const percentage = radiansToFraction(angle, gapSize);
                 const labelText = Math.round(percentage * max).toString();
 
                 newContext.fillStyle = 'white'

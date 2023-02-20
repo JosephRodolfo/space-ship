@@ -3,6 +3,7 @@ import { Rotation } from './rotation';
 export class Ship extends Rotation {
     x: number;
     y: number;
+    velocity: number;
     velocityX: number;
     velocityY: number;
     acceleration: number;
@@ -17,6 +18,7 @@ export class Ship extends Rotation {
         super();
         this.x = 250;
         this.y = 250;
+        this.velocity = 0;
         this.velocityX = 0;
         this.velocityY = 0;
         this.acceleration = 0.0;
@@ -44,9 +46,10 @@ export class Ship extends Rotation {
         // Calculate the total velocity magnitude and direction.
         const totalVelocityMagnitude = Math.sqrt(this.velocityX ** 2 + this.velocityY ** 2);
         // const totalVelocityAngle = Math.atan2(this.velocityY, this.velocityX);
+        this.velocity = totalVelocityMagnitude;
     
         // If the total velocity magnitude exceeds the speed of light, scale it back.
-        if (totalVelocityMagnitude > 299792458) {
+        if (this.velocity > 299792458) {
             const scaleFactor = 299792458 / totalVelocityMagnitude;
             this.velocityX *= scaleFactor;
             this.velocityY *= scaleFactor;
