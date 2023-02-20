@@ -87,12 +87,6 @@ function drawSequence(context: CanvasRenderingContext2D) {
         context.translate(-250,-250);
         context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
         context.restore();
-        // canvasDrawer.drawCircle(250, 250, props.circles![0].radius, context);
-        // context.fillStyle = 'green';
-        // context.beginPath();
-        // context.moveTo(250, 250);
-        // context.lineTo(255, 250);
-        // context.stroke();
     })
 
 }

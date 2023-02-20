@@ -23,6 +23,7 @@
       <button @click="flipShip">Turn</button>
 
     </div>
+    <Gauge :width="100" :height="100" :value="1919" :max="100" :gapSize="60"></Gauge>
     <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="[ship]">
     </MainCanvas>
 
@@ -33,10 +34,9 @@
 import { timer } from '../src/services/timer';
 import { Ship } from './classes/ship';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { degreesToRadians, radiansToDegrees, round } from './helpers/helpers';
+import Gauge from './components/gauges/Gauge.vue';
 import MainCanvas, { Circles } from './components/Canvas.vue';
 const ship = reactive(new Ship());
-let counter = 0;
 const acceleration = ref(ship.acceleration);
 let lock: any = ref(false);
 let angularAccelerationValue = ref(0);
@@ -69,10 +69,10 @@ function handleAccelerate(e: any) {
     move();
   }
   if (e.key === 'a' && !thrusterLock.value) {
+
+    move();
     thrusterLock.value = true;
     angularAccelerationValue.value = .01
-    move();
-
   }
   if (e.key === 'd' && !thrusterLock.value) {
     thrusterLock.value = true;
@@ -120,15 +120,12 @@ onMounted(() => {
   setInterval(() => {
 
     if (!lock.value && !thrusterLock.value && ship.acceleration === 0) {
-      console.log('main tiemr')
+      if (thrusterLock.value) ship.fireThruster(angularAccelerationValue.value);
       ship.calculateAngularVelocity(1);
       ship.setAngleFromAngularVelocity(1);
-
-      ship.stopAccelerating();
-      ship.calculateVelocity(1);
-
+      if (lock.value) ship.accelerate();
+      ship.calculateVelocity(1)
       ship.setPosition(1);
-
     }
   }, 100)
 })
