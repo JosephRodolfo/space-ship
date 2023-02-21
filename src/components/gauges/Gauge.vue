@@ -30,6 +30,10 @@ const props = defineProps({
 
     max: { type: Number },
     gapSize: { type: Number },
+    gapOffset: {
+        type: Number,
+        default: 0,
+    }
 
 
 });
@@ -52,7 +56,7 @@ onMounted(() => {
     if (!context) return;
 
 
-    gauge.value = canvasDrawer.clipGauge({ canvasToClip: context, height, width, max: props.max, logarithmic: false, gapSize: props.gapSize });
+    gauge.value = canvasDrawer.clipGauge({ canvasToClip: context, height, width, max: props.max, logarithmic: false, gapSize: props.gapSize, gapOffset: props.gapOffset });
     context.drawImage(gauge.value, 0, 0);
     // context.translate(xMidpoint, yMidpoint);
 
@@ -71,7 +75,7 @@ onMounted(() => {
     const percent = Math.abs(props.value!) / props.max!;
     const radians = decimalToRadian(percent, (360 - props.gapSize!));
     // let gapSizeRadians = degreesToRadians(props.gapSize!);
-    const offset = degreesToRadians(90);
+    const offset = degreesToRadians(90) - degreesToRadians(props.gapOffset);
 
     needleContext.save();
 
@@ -102,7 +106,7 @@ function degreesToRadians(degrees: number) {
 }
 
 watch([props], () => {
-    let offset = degreesToRadians(90);
+    let offset = degreesToRadians(90) - degreesToRadians(props.gapOffset);;
 
     needleContext = canvasRefNeedle.value?.getContext('2d');
 
@@ -143,7 +147,8 @@ watch([props], () => {
 
 <style scoped>
 .gauge-container {
-    width: 400px;
+    width: 100px;
+    height: 150px;
 }
 
 .canvasHolder {

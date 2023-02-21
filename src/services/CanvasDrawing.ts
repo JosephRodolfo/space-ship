@@ -104,7 +104,7 @@ class CanvasDrawing {
     }
 
 
-    clipGauge({ height, width, canvasToClip, logarithmic = false, max = 100, gapSize = 30 }: ClipGaugeOpts) {
+    clipGauge({ height, width, canvasToClip, logarithmic = false, max = 100, gapSize = 30, gapOffset = 0, }: ClipGaugeOpts) {
         const newCanvas: HTMLCanvasElement | null = document.createElement("canvas");
         const h = height;
         const w = width;
@@ -133,16 +133,23 @@ class CanvasDrawing {
         newContext.stroke();
 
 
-        function radiansToFraction(radians: number, gapSize: number = 0) {
+        function radiansToFraction(radians: number, gapSizeRadians: number = 0) {
             return radians / ((2 * Math.PI) - gapSizeRadians);
         }
+
+        function degreesToRadians(degrees: number) {
+            return degrees * (Math.PI / 180);
+        }
+
+        const offsetRadians = degreesToRadians(gapOffset);
+
 
         const numDashes = 12; // 360 degrees divided by 5
         const dashLength = 16;
         const angleIncrement = (2 * Math.PI - gapSizeRadians) / numDashes; // subtract gap size from total angle range
 
         for (let i = 0; i <= numDashes; i++) {
-            const angle = i * angleIncrement;
+            const angle = i * angleIncrement + offsetRadians;
             const x1 = width / 2 + (width / 2 - dashLength) * Math.cos(angle);
             const y1 = height / 2 + (width / 2 - dashLength) * Math.sin(angle);
             const x2 = width / 2 + width / 2 * Math.cos(angle);
@@ -157,7 +164,7 @@ class CanvasDrawing {
             if (i === numDashes || i === 0) {
                 const labelX = width / 2 + (width / 2 - 25) * Math.cos(angle);
                 const labelY = height / 2 + (width / 2 - 25) * Math.sin(angle);
-                const percentage = radiansToFraction(angle, gapSize);
+                const percentage = radiansToFraction(angle - offsetRadians, gapSizeRadians);
                 const labelText = Math.round(percentage * max).toString();
 
                 newContext.fillStyle = 'white'
@@ -184,6 +191,7 @@ interface ClipGaugeOpts {
     max?: number;
     logarithmic?: boolean;
     gapSize?: number;
+    gapOffset?: number;
 }
 
 export const canvasDrawer = new CanvasDrawing;

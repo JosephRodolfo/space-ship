@@ -23,12 +23,15 @@
       <button @click="flipShip">Turn</button>
 
     </div>
-    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="5" :gapSize="60" ></Gauge>
-    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="50" :gapSize="90" ></Gauge>
-    <Gauge :label="'x velocity'" :width="100" :height="100" :value="ship.velocityX" :max="100" :gapSize="120" ></Gauge>
+    <div class="gauge-dashboard">
+      <Gauge :label="'X Velocity'" :width="100" :height="100" :value="ship.velocityX" :max="50" :gapSize="60"></Gauge>
+      <Gauge :label="'Y Velocity'" :width="100" :height="100" :value="ship.velocityY" :max="50" :gapSize="90"
+        :gapOffset="90"></Gauge>
+      <Gauge :label="'Velocity'" :width="100" :height="100" :value="ship.velocity" :max="100" :gapSize="120"></Gauge>
 
-    <Gauge :label="'acceleration'" :width="100" :height="100" :value="ship.acceleration" :max="10" :gapSize="180" ></Gauge>
-
+      <Gauge :label="'Acceleration'" :width="100" :height="100" :value="ship.acceleration" :max="10" :gapSize="180" :gapOffset="90">
+      </Gauge>
+    </div>
     <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="[ship]">
     </MainCanvas>
 
@@ -153,4 +156,10 @@ function formatNumber(number: number) {
   justify-content: space-between;
 
 }
+
+.gauge-dashboard {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+height: fit-content;}
 </style>
