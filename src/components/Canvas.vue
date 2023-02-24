@@ -8,12 +8,11 @@
 <script setup lang="ts">
 
 import { canvasDrawer } from '../services/CanvasDrawing';
-import { onMounted, reactive, ref, watch } from 'vue';
-import { timer } from '../services/timer';
+import { onMounted, reactive, ref, watch, computed } from 'vue';
 export interface Circles {
     x: number,
     y: number,
-    // radius: number,
+    radius: number,
     // velocity: number,
     angle: number
     velocityX: number,
@@ -26,17 +25,29 @@ export interface Circles {
 }
 
 const props = defineProps({
-    circles: { type: Array<Circles> },
+    circles: {
+        type: Array<Circles>,
+        default: [],
+    },
+    scaleFactor: {
+        type: Number,
+        default: 1
+    },
+    background: {
+        type: Boolean,
+        default: true,
+    },
 });
 const canvasRef = ref<HTMLCanvasElement>();
 const background: string | any = ref('');
-const currentBackGroundPosition = reactive({x:0, y:0});
+const currentBackGroundPosition = reactive({ x: 0, y: 0 });
 const ship: string | any = ref('');
+
 
 onMounted(() => {
     const myContext = canvasRef.value?.getContext('2d');
     background.value = canvasDrawer.clipCanvas(0, myContext!, 'black');
-     ship.value = canvasDrawer.clipShip(myContext!);
+    ship.value = canvasDrawer.clipShip(myContext!);
 
     drawSequence(myContext!)
 })
@@ -47,22 +58,33 @@ watch([props], () => {
     let yVelocity = props.circles![0].velocityY;
 
     if (xVelocity > 499) {
-        xVelocity = 500;
+        xVelocity = 498;
     };
     if (xVelocity < -499) {
-        xVelocity = -500
+        xVelocity = -498
     };
     if (yVelocity > 499) {
-        yVelocity = 500;
+        yVelocity = 498;
     };
     if (yVelocity < -499) {
-        yVelocity = -500
+        yVelocity = -498
     };
 
     currentBackGroundPosition.x += xVelocity;
     currentBackGroundPosition.y += yVelocity;
 
     drawSequence(myContext!);
+})
+
+const planetCoords = computed(() => {
+    if (!props.circles![1]) {
+        return { x: 0, y: 0, radius: 0 };
+    }
+
+    const x = (props.circles![0].x - props.circles![1].x || 0) / props.scaleFactor + 250;
+    const y = (props.circles![0].y - props.circles![1].y || 0) / props.scaleFactor + 250;
+    const radius = props.circles[1].radius / props.scaleFactor;
+    return { x, y, radius }
 })
 
 function drawSequence(context: CanvasRenderingContext2D) {
@@ -80,13 +102,14 @@ function drawSequence(context: CanvasRenderingContext2D) {
     }
     requestAnimationFrame(() => {
 
-        context.drawImage(background.value, -500 + currentBackGroundPosition.x, -500 + currentBackGroundPosition.y, 1500, 1500);
+        if (props.background) context.drawImage(background.value, -500 + currentBackGroundPosition.x, -500 + currentBackGroundPosition.y, 1500, 1500);
         context.save()
         context.translate(250, 250);
         context.rotate(props.circles![0].thrusterAngle * Math.PI / 180);
-        context.translate(-250,-250);
+        context.translate(-250, -250);
         context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
         context.restore();
+        if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context)
     })
 
 }

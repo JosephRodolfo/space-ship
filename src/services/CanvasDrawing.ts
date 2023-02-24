@@ -104,7 +104,7 @@ class CanvasDrawing {
     }
 
 
-    clipGauge({ height, width, canvasToClip, logarithmic = false, max = 100, gapSize = 30, gapOffset = 0, }: ClipGaugeOpts) {
+    clipGauge({ height, width, canvasToClip, logarithmic = false, max = 100, gapSize = 30, gapOffset = 0, label = '', omitValues = false }: ClipGaugeOpts) {
         const newCanvas: HTMLCanvasElement | null = document.createElement("canvas");
         const h = height;
         const w = width;
@@ -143,6 +143,12 @@ class CanvasDrawing {
 
         const offsetRadians = degreesToRadians(gapOffset);
 
+        newContext.fillStyle = 'white'
+        newContext.font = "10px sans-serif";
+        newContext.textAlign = "center";
+        newContext.textBaseline = "middle";
+        newContext.fillText(label, width / 2, ((height / 2) *.8));
+
 
         const numDashes = 12; // 360 degrees divided by 5
         const dashLength = 16;
@@ -161,7 +167,7 @@ class CanvasDrawing {
             newContext.lineWidth = 2;
             newContext.stroke();
 
-            if (i === numDashes || i === 0) {
+            if ((i === numDashes || i === 0) && !omitValues) {
                 const labelX = width / 2 + (width / 2 - 25) * Math.cos(angle);
                 const labelY = height / 2 + (width / 2 - 25) * Math.sin(angle);
                 const percentage = radiansToFraction(angle - offsetRadians, gapSizeRadians);
@@ -192,6 +198,8 @@ interface ClipGaugeOpts {
     logarithmic?: boolean;
     gapSize?: number;
     gapOffset?: number;
+    label?: string;
+    omitValues?: boolean
 }
 
 export const canvasDrawer = new CanvasDrawing;

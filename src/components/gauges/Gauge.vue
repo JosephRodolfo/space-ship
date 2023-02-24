@@ -1,6 +1,5 @@
 <template>
     <div class="gauge-container">
-        <p>{{ props.label }}</p>
         <div class="canvasHolder">
             <canvas ref="canvasRef" class="canvas" :height="props.height" :width="props.width"> </canvas>
 
@@ -33,6 +32,10 @@ const props = defineProps({
     gapOffset: {
         type: Number,
         default: 0,
+    },
+    omitValues: {
+        type: Boolean,
+        default: false
     }
 
 
@@ -56,7 +59,7 @@ onMounted(() => {
     if (!context) return;
 
 
-    gauge.value = canvasDrawer.clipGauge({ canvasToClip: context, height, width, max: props.max, logarithmic: false, gapSize: props.gapSize, gapOffset: props.gapOffset });
+    gauge.value = canvasDrawer.clipGauge({ canvasToClip: context, height, width, max: props.max, logarithmic: false, gapSize: props.gapSize, gapOffset: props.gapOffset, label: props.label, omitValues: props.omitValues });
     context.drawImage(gauge.value, 0, 0);
     // context.translate(xMidpoint, yMidpoint);
 
@@ -148,7 +151,7 @@ watch([props], () => {
 <style scoped>
 .gauge-container {
     width: 100px;
-    height: 150px;
+    height: 100px;
 }
 
 .canvasHolder {
