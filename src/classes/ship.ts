@@ -141,7 +141,7 @@ export class Ship extends Rotation {
     }
     accelerate() {
         this.setAngle();
-        this.thrusterAcceleration += 100;
+        this.thrusterAcceleration += 10;
     }
 
       

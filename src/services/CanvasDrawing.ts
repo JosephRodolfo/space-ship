@@ -9,16 +9,18 @@ class CanvasDrawing {
     constructor() {
 
     }
-    drawCircle(x: number, y: number, radius: number, context: CanvasRenderingContext2D): void {
-        context.fillStyle = 'white';
+    drawCircle(x: number, y: number, radius: number, context: CanvasRenderingContext2D, thrusterLine: boolean = true, color: string = 'white'): void {
+        context.fillStyle = color;
         context.beginPath();
         context.arc(x, y, radius, 0, 2 * Math.PI);
         context.fill();
-        context.fillStyle = 'green';
-        context.beginPath();
-        context.moveTo(x, y);
-        context.lineTo(x - 10, y);
-        context.stroke();
+        if (thrusterLine) {
+            context.fillStyle = 'green';
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x - 10, y);
+            context.stroke();
+        }
     }
     // clearBackground(context: CanvasRenderingContext2D): void {
     //     const { width, height } = context.canvas;
@@ -54,10 +56,12 @@ class CanvasDrawing {
 
     clipShip(
         canvasToClip: CanvasRenderingContext2D,
+        height: number,
+        width: number,
     ) {
         const newCanvas: HTMLCanvasElement | null = document.createElement("canvas");
-        const h = 20;
-        const w = 20;
+        const h = height;
+        const w = width;
         newCanvas.width = w;
         newCanvas.height = h;
         const newContext = newCanvas.getContext("2d");
@@ -66,7 +70,7 @@ class CanvasDrawing {
         }
 
 
-        this.drawCircle(10, 10, 10, newContext)
+        this.drawCircle(height / 2, width / 2, width / 2, newContext)
 
         // newContext.fillStyle = 'white';
 

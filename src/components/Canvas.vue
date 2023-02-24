@@ -47,13 +47,16 @@ const ship: string | any = ref('');
 onMounted(() => {
     const myContext = canvasRef.value?.getContext('2d');
     background.value = canvasDrawer.clipCanvas(0, myContext!, 'black');
-    ship.value = canvasDrawer.clipShip(myContext!);
+    ship.value = canvasDrawer.clipShip(myContext!, 20, 20);
 
     drawSequence(myContext!)
 })
 
 watch([props], () => {
+
+
     const myContext = canvasRef.value?.getContext('2d');
+    
     let xVelocity = props.circles![0].velocityX;
     let yVelocity = props.circles![0].velocityY;
 

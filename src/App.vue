@@ -42,9 +42,10 @@
 
       <Gauge :label="'Angle'" :width="100" :height="100" :value="ship.angle" :max="360" :gapSize="0" :gapOffset="180"
         :omitValues="true"></Gauge>
+        <MiniMap :circles="circles" :scaleFactor="2000000"></MiniMap>
 
     </div>
-    <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="circles" :scaleFactor="20000">
+    <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="circles" :scaleFactor="2000">
     </MainCanvas>
   </div>
 </template>
@@ -54,6 +55,7 @@ import { Ship } from './classes/ship';
 import { Planet } from './classes/planet';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import Gauge from './components/gauges/Gauge.vue';
+import MiniMap from './components/MiniMap.vue';
 import MainCanvas, { Circles } from './components/Canvas.vue';
 const ship = reactive(new Ship());
 // const planet = reactive(new Planet(1082000 + 6370000 * 1, 5000, 6370000,  5.972e+24)); 
