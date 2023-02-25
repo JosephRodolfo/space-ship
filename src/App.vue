@@ -162,8 +162,7 @@ onMounted(() => {
     ship.calculateAngularVelocity(10);
     ship.setAngleFromAngularVelocity(10);
     if (lock.value) ship.accelerate();
-    ship.calculateVelocity(10, planet!)
-    ship.setPosition(10);
+    ship.moveShip(planet, 10);
 
   }, rateSpeed.speed)
 })
