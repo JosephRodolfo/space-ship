@@ -24,6 +24,8 @@
 
       <p>Angular Velocity: {{ formatNumber(ship.angularVelocity) }}</p>
       <button @click="flipShip">Turn</button>
+      <button @click="createExtrapolatedCoords">Extrapolate Future Position</button>
+
 
     </div>
     <div class="gauge-dashboard">
@@ -42,15 +44,16 @@
 
       <Gauge :label="'Angle'" :width="100" :height="100" :value="ship.angle" :max="360" :gapSize="0" :gapOffset="180"
         :omitValues="true"></Gauge>
-        <MiniMap :circles="circles" :scaleFactor="2000000"></MiniMap>
+        <MiniMap :circles="circles" :course="futureCourse" :scaleFactor="2000000"></MiniMap>
 
     </div>
-    <MainCanvas @keydown="handleAccelerate" @keyup="stopAccelerate" tabindex=-1 :circles="circles" :scaleFactor="2000">
+    <MainCanvas @keydown="handleAccelerate" :course="futureCourse" @keyup="stopAccelerate" tabindex=-1 :circles="circles" :scaleFactor="2000">
     </MainCanvas>
   </div>
 </template>
 <script setup lang="ts">
 import { timer } from '../src/services/timer';
+import { Coords } from './common/constants';
 import { Ship } from './classes/ship';
 import { Planet } from './classes/planet';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -71,7 +74,7 @@ const circles = computed(() => {
   if (planet) bodyArray.push(planet);
   return bodyArray
 })
-const acceleration = ref(ship.acceleration);
+let futureCourse: Coords[] | any = ref([]);
 let lock: any = ref(false);
 let angularAccelerationValue = ref(0);
 
@@ -151,6 +154,12 @@ watch([rateSpeed], () => {
   timer.set_interval(rateSpeed.speed)
 
 });
+
+function createExtrapolatedCoords() {
+let x = ship.extrapolatePosition(planet, 1000) ;
+  // console.log(x);
+  futureCourse.value = x;
+}
 
 
 

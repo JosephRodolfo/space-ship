@@ -9,6 +9,7 @@
 
 import { canvasDrawer } from '../services/CanvasDrawing';
 import { onMounted, reactive, ref, watch, computed } from 'vue';
+import { Coords } from '../common/constants';
 export interface Circles {
     x: number,
     y: number,
@@ -37,6 +38,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    course: {
+        type: Array<Coords>,
+        default: []
+    }
 });
 const canvasRef = ref<HTMLCanvasElement>();
 const background: string | any = ref('');
@@ -77,7 +82,38 @@ watch([props], () => {
     currentBackGroundPosition.y += yVelocity;
 
     drawSequence(myContext!);
+    canvasDrawer.drawCircle(250, 260, 100, myContext!, false, 'green')
+
+    // drawFutureCourse(props.course, myContext!);
 })
+
+// function drawFutureCourse(course: Coords[], context: CanvasRenderingContext2D): void {
+//     if (course.length === 0) return;
+//     for (let i = 0; i < 10 - 1; i++) {
+//         let two = i + 1;
+//         let x1 = course[i].x /// props.scaleFactor + 50
+//         let y1 = course[i].y /// props.scaleFactor + 50
+//         let x2 = course[two].x /// props.scaleFactor + 50
+//         let y2 = course[two].y /// props.scaleFactor + 50
+
+
+
+//         // Reset the current path
+//         console.log((x1 - props.circles![0].x)  / props.scaleFactor + 250)
+//         context.beginPath();
+//         context.moveTo((x1 - props.circles![0].x) / props.scaleFactor + 250, (y1 - props.circles![0].y)  / props.scaleFactor + 250);
+//         context.moveTo((x2 - props.circles![0].x) / props.scaleFactor + 250, (y2 - props.circles![0].y)  / props.scaleFactor + 250);
+//                 context.lineWidth = 100;
+
+//         context.strokeStyle = 'white';
+
+//         // Make the line visible
+//         context.stroke();
+
+
+//     }
+
+// }
 
 const planetCoords = computed(() => {
     if (!props.circles![1]) {
@@ -112,6 +148,8 @@ function drawSequence(context: CanvasRenderingContext2D) {
         context.translate(-250, -250);
         context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
         context.restore();
+        // drawFutureCourse(props.course, context!);
+
         if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context)
     })
 

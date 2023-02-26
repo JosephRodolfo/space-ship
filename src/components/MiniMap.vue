@@ -9,6 +9,7 @@
 
 import { canvasDrawer } from '../services/CanvasDrawing';
 import { onMounted, reactive, ref, watch, computed } from 'vue';
+import { Coords } from '../common/constants';
 export interface Circles {
     x: number,
     y: number,
@@ -21,6 +22,7 @@ export interface Circles {
     angularAcceleration: number,
     acceleration: number,
     thrusterAngle: number,
+    extrapolatePosition?: Function
 
 }
 
@@ -37,6 +39,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    course: {
+        type: Array<Coords>,
+        default: [],
+    }
 });
 const canvasRef = ref<HTMLCanvasElement>();
 const background: string | any = ref('');
@@ -55,10 +61,11 @@ onMounted(() => {
 
 watch([props], () => {
 
-
     const myContext = canvasRef.value?.getContext('2d');
-
-    drawSequence(myContext!);
+    myContext!.fillStyle = 'black'
+        myContext?.fillRect(0, 0, 100, 100);
+    drawSequence(myContext!, props.course);
+    drawFutureCourse(props.course, myContext!);
 })
 function drawCircle(x: number, y: number, radius: number, context: CanvasRenderingContext2D): void {
     context.fillStyle = 'orange';
@@ -66,7 +73,36 @@ function drawCircle(x: number, y: number, radius: number, context: CanvasRenderi
     context.arc(x, y, radius, 0, 2 * Math.PI);
     context.fill();
 }
+function drawFutureCourse(course: Coords[], context: CanvasRenderingContext2D): void {
+    if (course.length === 0) return;
+    for (let i = 0; i < course.length - 1; i++) {
+        let two = i + 1;
+        let x1 = course[i].x /// props.scaleFactor + 50
+        let y1 = course[i].y /// props.scaleFactor + 50
+        let x2 = course[two].x /// props.scaleFactor + 50
+        let y2 = course[two].y /// props.scaleFactor + 50
 
+
+
+        // Reset the current path
+        let offset = 50
+        context.beginPath();
+        // console.log((x1 - props.circles![0].x) / props.scaleFactor + offset, (y1 - props.circles![0].y) / props.scaleFactor + offset)
+        // console.log((x2 - props.circles![0].x) / props.scaleFactor + offset, (y2 - props.circles![0].y) / props.scaleFactor + offset);
+
+        context.moveTo( (x1 - props.circles![0].x) / props.scaleFactor + offset, (y1 - props.circles![0].y) / props.scaleFactor + offset,);
+        context.lineTo((x2 - props.circles![0].x) / props.scaleFactor + offset, (y2 - props.circles![0].y) / props.scaleFactor + offset);
+                context.lineWidth = 1;
+
+        context.strokeStyle = 'white';
+
+        // Make the line visible
+        context.stroke();
+
+
+    }
+
+}
 
 const planetCoords = computed(() => {
     if (!props.circles![1]) {
@@ -79,13 +115,11 @@ const planetCoords = computed(() => {
     return { x, y, radius }
 })
 
-function drawSequence(context: CanvasRenderingContext2D) {
+function drawSequence(context: CanvasRenderingContext2D, course: Coords[]) {
 
     requestAnimationFrame(() => {
-        context!.fillStyle = 'black'
-        context?.fillRect(0, 0, 100, 100);
         drawCircle(50, 50, 1, context!);
-        if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context, false, 'blue');
+        // if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context, false, 'blue');
     })
 
 }

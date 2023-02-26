@@ -38,7 +38,12 @@ export class Ship extends Rotation {
 
 
     }
-
+    get velocities() {
+        return { x: this.velocityX, y: this.velocityY }
+    }
+    get position() {
+        return { x: this.x, y: this.y }
+    }
 
     // applyGravity(planet: Planet, time: number, thrusterAcceleration: number, thrusterAngle: number) {
     //     // Calculate the distance between the ship and the planet
@@ -83,10 +88,9 @@ export class Ship extends Rotation {
     //     this.angle = totalVelocityAngle;
     // }
 
-    calculateXYAcceleration(planet: Planet, time: number, thrusterAcceleration: number, thrusterAngle: number) {
+    calculateXYAcceleration(planet: Planet, thrusterAcceleration: number, thrusterAngle: number, position: Coords) {
         // Calculate the distance between the ship and the planet
-        const { distance, distanceX, distanceY } = calculateDistance({ x: this.x, y: this.y }, { x: planet.x, y: planet.y })
-
+        const { distance, distanceX, distanceY } = calculateDistance({ x: position.x, y: position.y }, { x: planet.x, y: planet.y })
         // Calculate the gravitational force between the ship and the planet
         const force = (G * planet.mass * this.mass) / (distance ** 2);
 
@@ -117,8 +121,8 @@ export class Ship extends Rotation {
     }
     calculateXYVelocityFromAccelerations(accelerations: Velocities, time: number, velocities: Velocities) {
         return {
-            x: this.velocityX + accelerations.x * time,
-            y: this.velocityY + accelerations.y * time,
+            x: velocities.x + accelerations.x * time,
+            y: velocities.y + accelerations.y * time,
         }
     }
 
@@ -150,7 +154,7 @@ export class Ship extends Rotation {
     moveShip(planet: Planet, time: number) {
 
         if (planet) {
-            const { accelerationX, accelerationY } = this.calculateXYAcceleration(planet, time, this.thrusterAcceleration, this.thrusterAngle);
+            const { accelerationX, accelerationY } = this.calculateXYAcceleration(planet, this.thrusterAcceleration, this.thrusterAngle, this.position);
             this.acceleration = Math.sqrt(accelerationX ** 2 + accelerationY ** 2);
             const velocities = this.calculateXYVelocityFromAccelerations({ x: accelerationX, y: accelerationY }, time, { x: this.velocityX, y: this.velocityY });
             this.setXYVelocity(velocities);
@@ -171,27 +175,28 @@ export class Ship extends Rotation {
         this.setPosition(coords);
     }
 
-    extrapolatePosition(planet: Planet, time: number, initialVelocities: Velocities, initialVelocity: number, initialAcceleration: number, initialAngle: number, initialPosition: Coords) {
-        let velocities = initialVelocities
-        let acceleration = initialAcceleration;
-        let angle = initialAngle;
-        let position = initialPosition;
-        let velocity = initialVelocity
-                if (planet) {
-            const { accelerationX, accelerationY } = this.calculateXYAcceleration(planet, time, acceleration, angle);
-            acceleration = Math.sqrt(accelerationX ** 2 + accelerationY ** 2);
-             velocities = this.calculateXYVelocityFromAccelerations({ x: accelerationX, y: accelerationY }, time, velocities);
-        } else if (initialAcceleration !== 0) {
-             velocities = this.calculateXYVelocity(velocities, angle, time, initialAcceleration);
-        }
-        // const velocities = { x: this.velocityX, y: this.velocityY }
-        if (planet || acceleration! == 0) {
-            velocity = this.calculateTotalVelocity(velocities);
-            angle = this.calculateAngle(velocities);
-        }
+    extrapolatePosition(planet: Planet, times: number): Array<Coords> {
+        let result: Array<Coords> = [];
+        let reducedTimes = times;
+        let velocities = this.velocities;
+        let time = 10;
+        let acceleration = this.acceleration;
+        let angle = this.angle;
+        ;
+        let position = this.position;
 
-        const coords = this.calculatePosition(position, velocities, time);
-        return { coords, velocities, position, angle, acceleration, velocity };
+        // let velocity = initialVelocity;
+        while (reducedTimes > 0) {
+            acceleration = 0;
+            const { accelerationX, accelerationY } = this.calculateXYAcceleration(planet, acceleration, angle, position);
+            acceleration = Math.sqrt(accelerationX ** 2 + accelerationY ** 2);
+            velocities = this.calculateXYVelocityFromAccelerations({ x: accelerationX, y: accelerationY }, time, { x: velocities.x, y: velocities.y });
+            angle = this.calculateAngle(velocities);
+            position = this.calculatePosition(position, velocities, time);
+            result.push(position);
+            reducedTimes--
+        }
+        return result;
     }
 
     calculateAngle(velocities: Velocities) {
@@ -203,11 +208,11 @@ export class Ship extends Rotation {
         this.angle = newAngle
     }
 
-    calculateXYVelocity(velocities: Velocities, thrusterAngle: number, time: number, thrusterAcceleration: number) {
+    calculateXYVelocity(velocities: Velocities, thrusterAngle: number, time: number, thrusterAcceleration: number): Velocities {
         const angleInRadians = (thrusterAngle * Math.PI) / 180;
         const deltaVx = thrusterAcceleration * time * Math.cos(angleInRadians);
         const deltaVy = thrusterAcceleration * time * Math.sin(angleInRadians);
-        return { x: velocities.y + deltaVx, y: velocities.x + deltaVy }
+        return { x: velocities.x + deltaVx, y: velocities.y + deltaVy }
     }
 
     setXYVelocity(velocities: Velocities) {
