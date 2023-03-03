@@ -52,6 +52,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { controller } from './classes/controller';
 import { timer } from '../src/services/timer';
 import { Coords } from './common/constants';
 import { Ship } from './classes/ship';
@@ -74,8 +75,10 @@ const circles = computed(() => {
   if (planet) bodyArray.push(planet);
   return bodyArray
 })
-let futureCourse: Coords[] | any = ref([]);
+let futureCourse = ref<Array<Coords>>();
 let lock: any = ref(false);
+let collision: any = ref(false);
+
 let angularAccelerationValue = ref(0);
 
 let thrusterLock = ref(false);
@@ -157,8 +160,7 @@ watch([rateSpeed], () => {
 
 function createExtrapolatedCoords() {
 let x = ship.extrapolatePosition(planet, 1000) ;
-  // console.log(x);
-  futureCourse.value = x;
+  futureCourse.value = [...x];
 }
 
 
@@ -171,7 +173,15 @@ onMounted(() => {
     ship.calculateAngularVelocity(10);
     ship.setAngleFromAngularVelocity(10);
     if (lock.value) ship.accelerate();
-    ship.moveShip(planet, 10);
+    if (planet) {
+      const collision = controller.detectCollision(ship, planet!);
+      if (collision) {
+        ship.collision = true;
+      } else {
+        ship.collision = false;
+      }
+    }
+      ship.moveShip(planet, 10);
 
   }, rateSpeed.speed)
 })

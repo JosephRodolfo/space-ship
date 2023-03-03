@@ -22,6 +22,7 @@ export interface Circles {
     angularAcceleration: number,
     acceleration: number,
     thrusterAngle: number,
+    collision: boolean,
 
 }
 
@@ -61,7 +62,7 @@ watch([props], () => {
 
 
     const myContext = canvasRef.value?.getContext('2d');
-    
+
     let xVelocity = props.circles![0].velocityX;
     let yVelocity = props.circles![0].velocityY;
 
@@ -78,11 +79,11 @@ watch([props], () => {
         yVelocity = -498
     };
 
-    currentBackGroundPosition.x += xVelocity;
-    currentBackGroundPosition.y += yVelocity;
+    currentBackGroundPosition.x += xVelocity / 1000;
+    currentBackGroundPosition.y += yVelocity / 1000;
 
     drawSequence(myContext!);
-    canvasDrawer.drawCircle(250, 260, 100, myContext!, false, 'green')
+    // canvasDrawer.drawCircle(250, 260, 100, myContext!, false, 'green')
 
     // drawFutureCourse(props.course, myContext!);
 })
@@ -114,7 +115,10 @@ watch([props], () => {
 //     }
 
 // }
-
+const color = computed(() => {
+    const color = props.circles[0].collision ? 'red' : 'white';
+    return color;
+})
 const planetCoords = computed(() => {
     if (!props.circles![1]) {
         return { x: 0, y: 0, radius: 0 };
@@ -146,11 +150,13 @@ function drawSequence(context: CanvasRenderingContext2D) {
         context.translate(250, 250);
         context.rotate(props.circles![0].thrusterAngle * Math.PI / 180);
         context.translate(-250, -250);
-        context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
+        if (props.circles![1]) canvasDrawer.drawCircle(250, 250, 10, context, true, color.value)
+
+        // context.drawImage(ship.value, 0, 0, 20, 20, 240, 240, 20, 20);
         context.restore();
         // drawFutureCourse(props.course, context!);
 
-        if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context)
+        if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context, true, color.value)
     })
 
 }

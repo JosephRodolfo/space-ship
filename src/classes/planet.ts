@@ -1,6 +1,7 @@
 import { Ship } from "./ship";
 import { G, EARTH_MASS } from "../common/constants";
-export class Planet {
+import { Circles } from "../components/Canvas.vue";
+export class Planet implements Circles {
     x: number;
     y: number;
     mass: number;
@@ -12,13 +13,15 @@ export class Planet {
     angularVelocity!: number;
     angularAcceleration!: number;
     acceleration!: number;
-    thrusterAngle!: number;
+  thrusterAngle!: number;
+  collision: boolean;
   
     constructor(x: number, y: number, radius: number, mass: number) {
       this.x = x;
       this.y = y;
         this.mass = mass;
-        this.radius = radius;
+      this.radius = radius;
+      this.collision = false;
     }
   
     // calculateGravity(ship: Ship): [number, number] {

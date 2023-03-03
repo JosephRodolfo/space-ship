@@ -45,9 +45,7 @@ const props = defineProps({
     }
 });
 const canvasRef = ref<HTMLCanvasElement>();
-const background: string | any = ref('');
-const currentBackGroundPosition = reactive({ x: 0, y: 0 });
-const ship: string | any = ref('');
+const shipTrajectory = ref<HTMLImageElement>();
 
 
 onMounted(() => {
@@ -57,15 +55,21 @@ onMounted(() => {
     drawCircle(50, 50, 1, myContext!);
 })
 
+watch(() => props.course, () => {
+    const myContext = canvasRef.value?.getContext('2d');
 
+
+    shipTrajectory.value = drawFutureCourse(props.course);
+})
 
 watch([props], () => {
-
     const myContext = canvasRef.value?.getContext('2d');
     myContext!.fillStyle = 'black'
-        myContext?.fillRect(0, 0, 100, 100);
+    myContext?.fillRect(0, 0, 100, 100);
     drawSequence(myContext!, props.course);
-    drawFutureCourse(props.course, myContext!);
+    // drawFutureCourse(props.course);
+    // if (shipTrajectory.value) {
+    // }
 })
 function drawCircle(x: number, y: number, radius: number, context: CanvasRenderingContext2D): void {
     context.fillStyle = 'orange';
@@ -73,53 +77,57 @@ function drawCircle(x: number, y: number, radius: number, context: CanvasRenderi
     context.arc(x, y, radius, 0, 2 * Math.PI);
     context.fill();
 }
-function drawFutureCourse(course: Coords[], context: CanvasRenderingContext2D): void {
-    if (course.length === 0) return;
+function drawFutureCourse(course: Coords[]): HTMLImageElement | undefined {
+    console.log('drwaing future course')
+    const newCanvas: HTMLCanvasElement | null = document.createElement("canvas");
+
+    const context: CanvasRenderingContext2D | null = newCanvas.getContext("2d");
+    if (!context) return;
     for (let i = 0; i < course.length - 1; i++) {
         let two = i + 1;
-        let x1 = course[i].x /// props.scaleFactor + 50
-        let y1 = course[i].y /// props.scaleFactor + 50
-        let x2 = course[two].x /// props.scaleFactor + 50
-        let y2 = course[two].y /// props.scaleFactor + 50
 
-
-
-        // Reset the current path
+        let x1 = course[i].x
+        let y1 = course[i].y
+        let x2 = course[two].x
+        let y2 = course[two].y
         let offset = 50
         context.beginPath();
-        // console.log((x1 - props.circles![0].x) / props.scaleFactor + offset, (y1 - props.circles![0].y) / props.scaleFactor + offset)
-        // console.log((x2 - props.circles![0].x) / props.scaleFactor + offset, (y2 - props.circles![0].y) / props.scaleFactor + offset);
-
-        context.moveTo( (x1 - props.circles![0].x) / props.scaleFactor + offset, (y1 - props.circles![0].y) / props.scaleFactor + offset,);
-        context.lineTo((x2 - props.circles![0].x) / props.scaleFactor + offset, (y2 - props.circles![0].y) / props.scaleFactor + offset);
-                context.lineWidth = 1;
-
-        context.strokeStyle = 'white';
-
-        // Make the line visible
+        context.moveTo((props.circles![0].x - x1) / props.scaleFactor + offset, (props.circles![0].y - y1) / props.scaleFactor + offset);
+        context.lineTo((props.circles![0].x - x2) / props.scaleFactor + offset, (props.circles![0].y - y2) / props.scaleFactor + offset);
+        context.lineWidth = 1;
+        context.strokeStyle = 'red';
         context.stroke();
-
-
     }
-
+    const newImage = context.canvas.toDataURL("image/jpeg", 1.0);
+    const img = new Image();
+    img.src = newImage;
+    return img;
 }
 
 const planetCoords = computed(() => {
-    if (!props.circles![1]) {
-        return { x: 0, y: 0, radius: 0 };
-    }
-
+    if (!props.circles![1]) return { x: 0, y: 0, radius: 0 };
     const x = (props.circles![0].x - props.circles![1].x || 0) / props.scaleFactor + 50;
     const y = (props.circles![0].y - props.circles![1].y || 0) / props.scaleFactor + 50;
     const radius = props.circles[1].radius / props.scaleFactor;
     return { x, y, radius }
 })
 
-function drawSequence(context: CanvasRenderingContext2D, course: Coords[]) {
+function drawFutureTrajectory(context: CanvasRenderingContext2D, offsetX: number, offsetY: number) {
+    context.drawImage(shipTrajectory.value!, 0, 0, 100, 100, offsetX, offsetY, 100, 100);
+}
 
+function drawSequence(context: CanvasRenderingContext2D, course: Coords[]) {
     requestAnimationFrame(() => {
+        if (shipTrajectory.value) {
+
+            let z = (props.circles![0].x - props.course![0].x) / props.scaleFactor;
+            let y = (props.circles![0].y - props.course![0].y) / props.scaleFactor;
+
+            drawFutureTrajectory(context, z, y);
+        }
         drawCircle(50, 50, 1, context!);
-        // if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context, false, 'blue');
+        if (props.circles![1]) canvasDrawer.drawCircle(planetCoords.value.x, planetCoords.value.y, planetCoords.value.radius, context, false, 'blue');
+
     })
 
 }

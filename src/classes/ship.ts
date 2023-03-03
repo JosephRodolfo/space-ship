@@ -17,6 +17,7 @@ export class Ship extends Rotation {
     force: number;
     angularVelocity: number;
     angularAcceleration: number;
+    collision: boolean;
 
     constructor() {
         super();
@@ -35,7 +36,7 @@ export class Ship extends Rotation {
         this.force = 0.01;
         this.angularAcceleration = 0;
         this.angularVelocity = 0;
-
+        this.collision = false;
 
     }
     get velocities() {
