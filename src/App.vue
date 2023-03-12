@@ -53,7 +53,7 @@
 </template>
 <script setup lang="ts">
 import { controller } from './classes/controller';
-import { timer } from '../src/services/timer';
+import { Timer } from '../src/services/timer';
 import { Coords } from './common/constants';
 import { Ship } from './classes/ship';
 import { Planet } from './classes/planet';
@@ -77,28 +77,17 @@ const circles = computed(() => {
 })
 let futureCourse = ref<Array<Coords>>();
 let lock: any = ref(false);
-let collision: any = ref(false);
+let debounce: any = ref(false);
 
+let collision: any = ref(false);
+const timer = new Timer();
+let trajectoryTimer = new Timer();
 let angularAccelerationValue = ref(0);
 
 let thrusterLock = ref(false);
 function flipShip() {
   ship.setThrusterAngle(ship.thrusterAngle + 45);
 }
-
-
-// function move() {
-//   timer.start(() => {
-//     if (thrusterLock.value) ship.fireThruster(angularAccelerationValue.value);
-//     // ship.calculateAngularVelocity(10);
-//     // ship.setAngleFromAngularVelocity(10);
-//     if (lock.value) ship.accelerate();
-//     ship.calculateVelocity(10, planet!);
-//     ship.setPosition(10);
-
-//   }, rateSpeed.speed)
-// }
-
 
 
 function handleAccelerate(e: any) {
@@ -122,7 +111,12 @@ function handleAccelerate(e: any) {
 
 
   }
-
+  if (debounce.value) return;
+  debounce.value = true;
+  createExtrapolatedCoords();
+  setTimeout(() => {
+    debounce.value = false
+  }, 2000)
 
 }
 function stopAccelerate(e: any) {
@@ -158,9 +152,19 @@ watch([rateSpeed], () => {
 
 });
 
+
 function createExtrapolatedCoords() {
-let x = ship.extrapolatePosition(planet, 1000) ;
-  futureCourse.value = [...x];
+  let result = ship.extrapolatePosition(planet, 1000);
+  const { radius } = ship;
+  for (let i = 0; i < result.length; i++){
+    const { x, y } = result[i];
+    const collision = controller.detectCollision(planet, { radius, x, y });
+    if (collision) {
+      return;
+    }
+    
+  };
+  futureCourse.value = [...result];
 }
 
 
@@ -177,6 +181,8 @@ onMounted(() => {
       const collision = controller.detectCollision(ship, planet!);
       if (collision) {
         ship.collision = true;
+        alert('You collided with something. Resetting')
+        ship.reset();
       } else {
         ship.collision = false;
       }

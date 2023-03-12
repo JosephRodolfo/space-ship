@@ -46,6 +46,25 @@ export class Ship extends Rotation {
         return { x: this.x, y: this.y }
     }
 
+    reset() {
+        this.x = 250;
+        this.y = 250;
+        this.radius = 10;
+        this.velocity = 0;
+        this.velocityX = 0;
+        this.velocityY = 7900;
+        // this.velocityY = 0;
+        this.thrusterAcceleration = 0.0;
+        this.acceleration = 0.0;
+        this.mass = 420000;
+        this.angle = 0;
+        this.thrusterAngle = 0;
+        this.force = 0.01;
+        this.angularAcceleration = 0;
+        this.angularVelocity = 0;
+        this.collision = false;
+
+    }
     // applyGravity(planet: Planet, time: number, thrusterAcceleration: number, thrusterAngle: number) {
     //     // Calculate the distance between the ship and the planet
     //     const { distance, distanceX, distanceY } = calculateDistance({ x: this.x, y: this.y }, { x: planet.x, y: planet.y })

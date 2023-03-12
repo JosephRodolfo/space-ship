@@ -56,9 +56,6 @@ onMounted(() => {
 })
 
 watch(() => props.course, () => {
-    const myContext = canvasRef.value?.getContext('2d');
-
-
     shipTrajectory.value = drawFutureCourse(props.course);
 })
 
