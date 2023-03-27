@@ -65,48 +65,6 @@ export class Ship extends Rotation {
         this.collision = false;
 
     }
-    // applyGravity(planet: Planet, time: number, thrusterAcceleration: number, thrusterAngle: number) {
-    //     // Calculate the distance between the ship and the planet
-    //     const { distance, distanceX, distanceY } = calculateDistance({ x: this.x, y: this.y }, { x: planet.x, y: planet.y })
-
-    //     // Calculate the gravitational force between the ship and the planet
-    //     const force = (G * planet.mass * this.mass) / (distance ** 2);
-
-    //     // Calculate the angle between the ship and the planet
-    //     const angle = Math.atan2(distanceY, distanceX);
-
-    //     // Calculate the acceleration due to the gravitational force
-    //     const gravitationalAcceleration = force / this.mass;
-
-    //     // Calculate the x and y components of the gravitational acceleration
-    //     const gravitationalAccelerationX = gravitationalAcceleration * Math.cos(angle);
-    //     const gravitationalAccelerationY = gravitationalAcceleration * Math.sin(angle);
-
-    //     // Calculate the thrust acceleration if the thrusters are firing
-    //     let thrustAccelerationX = 0;
-    //     let thrustAccelerationY = 0;
-    //     if (thrusterAcceleration > 0) {
-    //         const thrustAcceleration = thrusterAcceleration/// this.mass;
-    //         const thrusterAngleInRadians = (thrusterAngle * Math.PI) / 180;
-    //         thrustAccelerationX = thrustAcceleration * Math.cos(thrusterAngleInRadians);
-    //         thrustAccelerationY = thrustAcceleration * Math.sin(thrusterAngleInRadians);
-    //     }
-
-    //     // Calculate the total acceleration
-    //     const accelerationX = gravitationalAccelerationX + thrustAccelerationX;
-    //     const accelerationY = gravitationalAccelerationY + thrustAccelerationY;
-
-    //     // Update the x and y components of the velocity based on the total acceleration
-    //     this.velocityX += accelerationX * time;
-    //     this.velocityY += accelerationY * time;
-
-    //     // Calculate the angle of the new velocity vector
-    //     const totalVelocityAngle = Math.atan2(this.velocityY, this.velocityX);
-
-    //     // Update the ship's acceleration and total velocity angle
-    //     this.acceleration = Math.sqrt(accelerationX ** 2 + accelerationY ** 2);
-    //     this.angle = totalVelocityAngle;
-    // }
 
     calculateXYAcceleration(planet: Planet, thrusterAcceleration: number, thrusterAngle: number, position: Coords) {
         // Calculate the distance between the ship and the planet
@@ -146,30 +104,6 @@ export class Ship extends Rotation {
         }
     }
 
-
-    // calculateVelocity(time: number, planet?: Planet) {
-
-    //     if (planet) {
-    //         this.applyGravity(planet, time);
-    //     } else {
-    //         this.acceleration = this.thrusterAcceleration;
-    //         if (this.thrusterAcceleration === 0 || this.acceleration === 0) return;
-    //         const angleInRadians = (this.thrusterAngle * Math.PI) / 180;
-    //         const deltaVx = this.thrusterAcceleration * time * Math.cos(angleInRadians);
-    //         const deltaVy = this.thrusterAcceleration * time * Math.sin(angleInRadians);
-    //         this.velocityX += deltaVx;
-    //         this.velocityY += deltaVy;
-    //     }
-
-    //     const totalVelocityMagnitude = Math.sqrt(
-    //         this.velocityX ** 2 + this.velocityY ** 2
-    //     );
-    //     this.velocity = totalVelocityMagnitude;
-
-
-    //     const totalVelocityAngle = Math.atan2(this.velocityY, this.velocityX);
-    //     this.angle = (totalVelocityAngle * 180) / Math.PI;
-    // }
 
     moveShip(planet: Planet, time: number) {
 

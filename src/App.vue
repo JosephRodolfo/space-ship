@@ -44,10 +44,11 @@
 
       <Gauge :label="'Angle'" :width="100" :height="100" :value="ship.angle" :max="360" :gapSize="0" :gapOffset="180"
         :omitValues="true"></Gauge>
-        <MiniMap :circles="circles" :course="futureCourse" :scaleFactor="2000000"></MiniMap>
+      <MiniMap :circles="circles" :course="futureCourse" :scaleFactor="2000000"></MiniMap>
 
     </div>
-    <MainCanvas @keydown="handleAccelerate" :course="futureCourse" @keyup="stopAccelerate" tabindex=-1 :circles="circles" :scaleFactor="2000">
+    <MainCanvas @keydown="handleAccelerate" :course="futureCourse" @keyup="stopAccelerate" tabindex=-1 :circles="circles"
+      :scaleFactor="2000">
     </MainCanvas>
   </div>
 </template>
@@ -64,7 +65,7 @@ import MainCanvas, { Circles } from './components/Canvas.vue';
 const ship = reactive(new Ship());
 // const planet = reactive(new Planet(1082000 + 6370000 * 1, 5000, 6370000,  5.972e+24)); 
 
-const planet = reactive(new Planet(42000 + 6370000 * 1, 5000, 6370000,  5.972e+24)); //real values
+const planet = reactive(new Planet(42000 + 6370000 * 1, 5000, 6370000, 5.972e+24)); //real values
 // const planet = null
 const rateSpeed = reactive({ speed: 100 });
 
@@ -79,9 +80,7 @@ let futureCourse = ref<Array<Coords>>();
 let lock: any = ref(false);
 let debounce: any = ref(false);
 
-let collision: any = ref(false);
 const timer = new Timer();
-let trajectoryTimer = new Timer();
 let angularAccelerationValue = ref(0);
 
 let thrusterLock = ref(false);
@@ -146,6 +145,15 @@ function stopAccelerate(e: any) {
   }
 }
 
+function reset(message: string) {
+  lock.value = false;
+  ship.collision = true;
+  alert(message)
+  ship.reset();
+  timer.stop();
+  init();
+}
+
 
 watch([rateSpeed], () => {
   timer.set_interval(rateSpeed.speed)
@@ -156,20 +164,19 @@ watch([rateSpeed], () => {
 function createExtrapolatedCoords() {
   let result = ship.extrapolatePosition(planet, 1000);
   const { radius } = ship;
-  for (let i = 0; i < result.length; i++){
+  for (let i = 0; i < result.length; i++) {
     const { x, y } = result[i];
     const collision = controller.detectCollision(planet, { radius, x, y });
     if (collision) {
       return;
     }
-    
+
   };
   futureCourse.value = [...result];
 }
 
 
-
-onMounted(() => {
+function init() {
 
   timer.start(() => {
 
@@ -180,16 +187,18 @@ onMounted(() => {
     if (planet) {
       const collision = controller.detectCollision(ship, planet!);
       if (collision) {
-        ship.collision = true;
-        alert('You collided with something. Resetting')
-        ship.reset();
-      } else {
-        ship.collision = false;
+        reset('You collided with something. Resetting');
       }
     }
-      ship.moveShip(planet, 10);
+    ship.moveShip(planet, 10);
 
   }, rateSpeed.speed)
+}
+
+
+onMounted(() => {
+  init();
+
 })
 
 function formatNumber(number: number) {
